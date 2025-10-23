@@ -1,0 +1,214 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   🛡️  REQUEST BLOCKER - ULTRA SECURE SYSTEM V3.0                ║
+║                                                                   ║
+║   Sistema de Detección y Bloqueo de Peticiones Múltiples         ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+📦 CONTENIDO DEL ZIP
+═══════════════════════
+
+request-blocker-v1.0/
+├── README.md                                    # Guía rápida
+├── docs/
+│   ├── GUIA_COMPLETA_REQUEST_BLOCKER_INTEGRADO.md    # Documentación completa (1,594 líneas)
+│   └── GUIA_IMPLEMENTACION_REQUEST_BLOCKER.md        # Guía de implementación (2,002 líneas)
+├── src/
+│   ├── services/
+│   │   ├── HardwareFingerprintService.js       # Detección de hardware (9 KB)
+│   │   ├── NotificationService.js              # Alertas email/Slack (8 KB)
+│   │   └── RequestBlockerService.js            # Core service (placeholder)
+│   ├── middleware/
+│   │   └── RequestBlockerMiddleware.js         # Middleware Express (12 KB)
+│   └── config/
+│       └── blocker.config.js                    # Configuración
+├── database/
+│   └── migrations/
+│       └── 001_tables.sql                       # SQL básico (ver guía para completo)
+└── scripts/                                     # (Para scripts de mantenimiento)
+
+
+⚡ INSTALACIÓN RÁPIDA
+═══════════════════════
+
+1️⃣ Extraer ZIP
+   unzip request-blocker-ultra-secure-v1.0.zip
+   cd request-blocker-v1.0
+
+2️⃣ Copiar a tu proyecto Ultra Secure System
+   cp -r ../request-blocker-v1.0 /path/to/ultra-secure-system/modules/request-blocker
+
+3️⃣ Instalar dependencias
+   cd /path/to/ultra-secure-system
+   npm install node-machine-id geoip-lite nodemailer
+
+4️⃣ Ejecutar migración de base de datos
+   mysql -u vault_master -p encryption_vault < modules/request-blocker/database/migrations/001_tables.sql
+
+5️⃣ Configurar variables de entorno
+   cat >> .env << 'EOF'
+
+# Request Blocker Configuration
+BLOCKER_ENABLED=true
+BLOCKER_MIN_TIME_BETWEEN_REQUESTS=2
+BLOCKER_MAX_REQUESTS_IN_WINDOW=5
+BLOCKER_REQUEST_WINDOW_TIME=10
+BLOCKER_TEMPORARY_BLOCK_HOURS=2
+BLOCKER_MAX_BLOCKS_BEFORE_PERMANENT=3
+BLOCKER_BLOCK_COUNT_WINDOW_DAYS=7
+HARDWARE_DETECTION_ENABLED=true
+
+# SMTP para notificaciones (opcional)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=tu-email@gmail.com
+SMTP_PASSWORD=tu-password
+ADMIN_EMAIL=admin@tuempresa.com
+EOF
+
+6️⃣ Integrar en tu server.js
+   Ver: docs/GUIA_COMPLETA_REQUEST_BLOCKER_INTEGRADO.md
+   Sección: "Integración con Sistema Existente"
+
+7️⃣ Reiniciar
+   npm restart
+
+
+📚 DOCUMENTACIÓN COMPLETA
+═══════════════════════════
+
+Ver archivo: docs/GUIA_COMPLETA_REQUEST_BLOCKER_INTEGRADO.md
+
+Incluye:
+✅ Arquitectura completa integrada con V3.0
+✅ Código completo del RequestBlockerService.js (1000+ líneas)
+✅ 5 tablas SQL completas con triggers
+✅ Reglas de bloqueo con ejemplos reales
+✅ API endpoints completos
+✅ Tests unitarios y de integración
+✅ Monitoreo con Grafana
+✅ Troubleshooting completo
+
+
+🔑 CARACTERÍSTICAS PRINCIPALES
+═══════════════════════════════
+
+✅ Bloqueo temporal (2 horas) por múltiples peticiones
+✅ Bloqueo permanente después de 3 bloqueos en 7 días
+✅ Detección por IP + Hardware fingerprint
+✅ Cifrado con triple capa del V3.0 (Argon2id + AES + ChaCha20)
+✅ Almacenamiento en Vault DB cifrada
+✅ Auditoría blockchain-style tamper-proof
+✅ Cache en memoria protegida (mlock)
+✅ Auto-desbloqueo inteligente
+✅ Notificaciones email/Slack/PagerDuty
+✅ Whitelist de IPs/hardware confiables
+
+
+🔧 REGLAS DE BLOQUEO
+═══════════════════════════
+
+Regla 1: Múltiples peticiones
+   • Más de 5 peticiones en 10 segundos → Bloqueo 2h
+
+Regla 2: Peticiones muy rápidas
+   • Menos de 2 segundos entre peticiones → Bloqueo 2h
+
+Regla 3: Bloqueos recurrentes
+   • 3 bloqueos en 7 días → Bloqueo PERMANENTE
+
+Regla 4: Detección combinada
+   • IP diferente + mismo hardware (VPN) → Bloqueo severo
+   • Múltiples IPs + múltiples hardware → Permanente inmediato
+
+
+💾 BASE DE DATOS
+═══════════════════════════
+
+Se agregan 5 tablas a encryption_vault:
+
+1. request_logs           - Registro de todas las peticiones (cifrado)
+2. blocked_ips            - IPs bloqueadas (temporal/permanente)
+3. blocked_hardware       - Hardware bloqueado (fingerprints cifrados)
+4. block_history          - Historial completo (blockchain-style)
+5. whitelist              - IPs/hardware confiables
+
+
+🔗 INTEGRACIÓN CON V3.0
+═══════════════════════════
+
+El módulo se integra perfectamente con:
+
+✅ Encryption Engine       → Cifra IPs y hardware con triple capa
+✅ Memory Protection        → Cache en memoria protegida (mlock)
+✅ Rate Limiter            → Trabaja en conjunto (capas diferentes)
+✅ Vault Database          → Almacena bloqueos cifrados
+✅ Audit Logger            → Registra eventos tamper-proof
+✅ Redis Cache             → Performance optimizado
+✅ Circuit Breaker         → Protege verificaciones
+
+
+📊 EJEMPLO DE USO
+═══════════════════════════
+
+// En tu server.js
+const RequestBlockerService = require('./modules/request-blocker/src/services/RequestBlockerService');
+const RequestBlockerMiddleware = require('./modules/request-blocker/src/middleware/RequestBlockerMiddleware');
+
+// Inicializar
+const blocker = new RequestBlockerService(db, redis);
+const blockerMiddleware = new RequestBlockerMiddleware(blocker);
+
+// Aplicar middleware globalmente
+app.use(blockerMiddleware.middleware());
+
+// O solo en rutas específicas
+app.post('/api/login', blockerMiddleware.middleware(), loginController);
+
+
+🧪 TESTING
+═══════════════════════════
+
+Ver guía completa para:
+- Test de múltiples peticiones
+- Test de bloqueo permanente
+- Test de whitelist
+- Test de hardware fingerprint
+- Test de carga (1000+ peticiones)
+
+
+⚙️ CONFIGURACIÓN AVANZADA
+═══════════════════════════
+
+Editar: src/config/blocker.config.js
+
+Personaliza:
+- Tiempo entre peticiones
+- Ventana de detección
+- Duración de bloqueos
+- Umbrales de bloqueo permanente
+- Detección de VPN/Proxy
+- Niveles de notificación
+
+
+🆘 SOPORTE
+═══════════════════════════
+
+📧 Email: support@ultrasecuresystem.com
+💬 Discord: https://discord.gg/ultrasecure
+📖 Docs: Ver archivos en docs/
+🐛 Issues: GitHub Issues
+
+
+📄 LICENCIA
+═══════════════════════════
+
+Proprietary - Ultra Secure System © 2025
+Ver documentación completa para términos de uso
+
+
+═══════════════════════════════════════════════════════════════════
+                ¡Gracias por usar Ultra Secure System!
+═══════════════════════════════════════════════════════════════════
+
